@@ -42,12 +42,20 @@ export default function DashboardPage() {
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Leads</h2>
-        <button
-          onClick={() => navigate("/register")}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          Register Interest
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate("/register")}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Register Interest
+          </button>
+          <button
+            onClick={() => { localStorage.removeItem("token"); navigate("/login"); }}
+            className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-600 text-sm font-medium rounded-lg transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
 
       {/* Service filter */}

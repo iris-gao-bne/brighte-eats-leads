@@ -2,6 +2,21 @@ import { gql } from "@apollo/client";
 import type { TypedDocumentNode } from "@apollo/client";
 import type { Lead } from "./queries";
 
+export interface LoginVars {
+  email: string;
+  password: string;
+}
+
+export interface LoginData {
+  login: string;
+}
+
+export const LOGIN_MUTATION: TypedDocumentNode<LoginData, LoginVars> = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password)
+  }
+`;
+
 export interface RegisterVars {
   name: string;
   email: string;
