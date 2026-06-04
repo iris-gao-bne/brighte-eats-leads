@@ -9,18 +9,23 @@
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:test:setup": "docker exec brighte-eats-leads-postgres-1 createdb -U brighte brighte_eats_test 2>/dev/null; DATABASE_URL=postgresql://brighte:brighte@localhost:5432/brighte_eats_test ./node_modules/.bin/prisma migrate deploy",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@apollo/server": "^5.0.0",
     "@prisma/client": "^5.22.0",
     "dotenv": "^16.4.5",
-    "graphql": "^16.9.0"
+    "graphql": "^16.9.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "prisma": "^5.22.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.8"
   }
 }
