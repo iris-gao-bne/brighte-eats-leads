@@ -1,5 +1,6 @@
 export const ErrorCode = {
   BAD_USER_INPUT: "BAD_USER_INPUT",
+  UNAUTHENTICATED: "UNAUTHENTICATED",
 } as const;
 
 export const PrismaErrorCode = {

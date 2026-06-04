@@ -1,8 +1,10 @@
 import { GraphQLError } from "graphql";
 import { Prisma } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import { prisma } from "../prisma.js";
 import { RegisterInputSchema } from "../validation.js";
 import { ErrorCode, PrismaErrorCode } from "../constants.js";
+import { signToken } from "../auth.js";
 
 export const mutationResolvers = {
   register: async (_: unknown, args: unknown) => {
@@ -30,9 +32,7 @@ export const mutationResolvers = {
       const unknownServices = uniqueSlugs.filter((s) => !found.has(s));
       throw new GraphQLError(
         `Unknown service type(s): ${unknownServices.join(", ")}`,
-        {
-          extensions: { code: ErrorCode.BAD_USER_INPUT },
-        },
+        { extensions: { code: ErrorCode.BAD_USER_INPUT } },
       );
     }
 
@@ -59,5 +59,21 @@ export const mutationResolvers = {
       }
       throw err;
     }
+  },
+
+  login: async (_: unknown, args: { email: string; password: string }) => {
+    const user = await prisma.user.findUnique({ where: { email: args.email } });
+
+    const invalid = () =>
+      new GraphQLError("Invalid email or password", {
+        extensions: { code: ErrorCode.BAD_USER_INPUT },
+      });
+
+    if (!user) throw invalid();
+
+    const valid = await bcrypt.compare(args.password, user.passwordHash);
+    if (!valid) throw invalid();
+
+    return signToken({ userId: user.id, email: user.email });
   },
 };

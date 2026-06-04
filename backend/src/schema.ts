@@ -33,5 +33,6 @@ export const typeDefs = `#graphql
       postcode: String!
       services: [String!]!
     ): Lead!
+    login(email: String!, password: String!): String!
   }
 `;

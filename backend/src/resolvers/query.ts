@@ -2,9 +2,20 @@ import { GraphQLError } from "graphql";
 import { prisma } from "../prisma.js";
 import { LeadsArgsSchema } from "../validation.js";
 import { ErrorCode } from "../constants.js";
+import type { Context } from "../context.js";
+
+function requireAuth(context: Context) {
+  if (!context.userId) {
+    throw new GraphQLError("You must be logged in to access this resource", {
+      extensions: { code: ErrorCode.UNAUTHENTICATED },
+    });
+  }
+}
 
 export const queryResolvers = {
-  leads: async (_: unknown, args: unknown) => {
+  leads: async (_: unknown, args: unknown, context: Context) => {
+    requireAuth(context);
+
     const result = LeadsArgsSchema.safeParse(args);
     if (!result.success) {
       throw new GraphQLError(result.error.issues[0].message, {
@@ -32,7 +43,8 @@ export const queryResolvers = {
     return { items, total };
   },
 
-  lead: async (_: unknown, args: { id: number }) => {
+  lead: async (_: unknown, args: { id: number }, context: Context) => {
+    requireAuth(context);
     return prisma.lead.findUnique({ where: { id: args.id } });
   },
 

@@ -19,7 +19,7 @@ const port = Number(process.env.PORT) || 4000;
 
 const { url } = await startStandaloneServer(server, {
   listen: { port },
-  context: async () => createContext(),
+  context: async ({ req }) => createContext(req.headers.authorization),
 });
 
 console.log(`GraphQL server ready at ${url}`);

@@ -4,6 +4,8 @@ import { leadFieldResolvers } from "../resolvers/lead.js";
 import { createContext } from "../context.js";
 import { prisma } from "../prisma.js";
 
+const authContext = { ...createContext(), userId: 1 };
+
 beforeEach(async () => {
   await prisma.leadService.deleteMany();
   await prisma.lead.deleteMany();
@@ -37,23 +39,26 @@ describe("lead query", () => {
       },
     });
 
-    const lead = await queryResolvers.lead(null, { id: created.id });
+    const lead = await queryResolvers.lead(null, { id: created.id }, authContext);
 
     expect(lead).not.toBeNull();
     expect(lead!.id).toBe(created.id);
     expect(lead!.name).toBe("Alice");
     expect(lead!.email).toBe("alice@test.com");
 
-    const services = await leadFieldResolvers.services(
-      lead!,
-      null,
-      createContext(),
-    );
+    const services = await leadFieldResolvers.services(lead!, null, createContext());
     expect(services).toEqual(expect.arrayContaining(["delivery", "payment"]));
   });
 
   it("returns null for a non-existent id", async () => {
-    const lead = await queryResolvers.lead(null, { id: 999999 });
+    const lead = await queryResolvers.lead(null, { id: 999999 }, authContext);
     expect(lead).toBeNull();
+  });
+
+  it("rejects unauthenticated requests", async () => {
+    const anonContext = { ...createContext(), userId: null };
+    await expect(
+      queryResolvers.lead(null, { id: 1 }, anonContext),
+    ).rejects.toMatchObject({ extensions: { code: "UNAUTHENTICATED" } });
   });
 });
