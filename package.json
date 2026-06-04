@@ -4,7 +4,7 @@
   "description": "Expression of interest collector and dashboard for Brighte Eats.",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently --names \"BE,FE\" --prefix-colors \"blue,green\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+    "dev": "npx concurrently --names \"BE,FE\" --prefix-colors \"blue,green\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
   },
   "repository": {
     "type": "git",
