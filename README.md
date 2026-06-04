@@ -29,6 +29,7 @@ docker compose up -d
 **2. Install dependencies & set up the database**
 
 ```bash
+cp backend/.env.example backend/.env
 cd backend && npm install && npm run db:migrate && npm run db:seed && cd ..
 cd frontend && npm install && cd ..
 ```
@@ -51,7 +52,15 @@ cd backend && npm run dev
 cd frontend && npm run dev
 ```
 
-**4. (Optional) Prisma Studio**
+**4. (Optional) Run tests**
+
+```bash
+cp backend/.env.test.example backend/.env.test
+cd backend && npm run db:test:setup   # creates test DB and runs migrations
+npm test
+```
+
+**5. (Optional) Prisma Studio**
 
 ```bash
 cd backend
@@ -104,7 +113,7 @@ The email field has a database-level UNIQUE constraint, which assumes that each 
 
 ## Idempotency approach
 
-The `register` mutation is intentionally not idempotent. Because If someone submits the same email twice, I want to tell them "you're already registered" rather than not silently succeed. 
+The `register` mutation is intentionally not idempotent. Because If someone submits the same email twice, I want to tell them "you're already registered" rather than silently succeed. 
 
 The uniqueness guarantee lives at the database layer (`UNIQUE` constraint on `Lead.email`), not in application code. The application catches Prisma's `P2002` error and translates it into a structured GraphQL error so the frontend can display it inline. This means even concurrent duplicate submissions are handled correctly, one wins at the DB level, the other gets a clean error.
 
@@ -116,7 +125,7 @@ The uniqueness guarantee lives at the database layer (`UNIQUE` constraint on `Le
 
 **DataLoader for all relations** — Currently DataLoader only batches `Lead.services`. At 10× with deeper queries, every relation would need its own loader to avoid N+1.
 
-**Caching the `services` query** — The service list changes rarely. It's a good candidate for a short-lived server-side cache (Apollo response cache or a simple in-memory TTL) to avoid hitting the DB on every form load.
+**Caching the `services` query** — The service list changes rarely. It's a good candidate for a short-lived server-side cache to avoid hitting the DB on every form load.
 
 ## TODOs / known gaps
 
@@ -137,13 +146,13 @@ Claude was used throughout this project:
 - Drafting README sections
 
 **Where I verified or changed the output:**
-- Reviewed all resolver logic and corrected the bug in the `register` mutation (which caused the duplicate email catch block to be bypassed)
-- Adjusted Apollo Client v4 import paths after the AI used deprecated v3-style imports
-- Moved route-level components (`RegistrationForm`, `LeadsDashboard`) from `components/` to `pages/`(the AI initially placed them in the wrong folder)
-- Questioned the initial single-column index on `LeadService.serviceSlug` and pushed for a covering index `(serviceSlug, leadId)` to avoid table lookups on service filter queries
-- Moved validation logic out of the component into a dedicated `utils/validation.ts` file
-- Made product decisions the AI flagged but left open: idempotency behaviour, which queries require auth, token storage trade-offs
+- Reviewed all resolver logic and corrected the bug in the `register` mutation (which caused the duplicate email catch block to be bypassed).
+- Adjusted Apollo Client v4 import paths after the AI used deprecated v3-style imports.
+- Moved route-level components (`RegistrationForm`, `LeadsDashboard`) from `components/` to `pages/`(the AI initially placed them in the wrong folder).
+- Questioned the initial single-column index on `LeadService.serviceSlug` and pushed for a covering index `(serviceSlug, leadId)` to avoid table lookups on service filter queries.
+- Moved validation logic out of the component into a dedicated `utils/validation.ts` file.
+- Made product decisions the AI flagged but left open: idempotency behaviour, which queries require auth, token storage trade-offs.
 
 **Limitations encountered:**
-- AI was unaware of Apollo Client v4 and Apollo Server v5 breaking changes (hooks moved to `/react`, `ApolloError` replaced by `CombinedGraphQLErrors`, `uri` shorthand removed)
-- Needed manual correction when parallel test files caused DB interference (fixed by adding `fileParallelism: false` and moving cleanup to `beforeEach`)
+- AI was unaware of Apollo Client v4 and Apollo Server v5 breaking changes (hooks moved to `/react`, `ApolloError` replaced by `CombinedGraphQLErrors`, `uri` shorthand removed).
+- Needed manual correction when parallel test files caused DB interference (fixed by adding `fileParallelism: false` and moving cleanup to `beforeEach`).
