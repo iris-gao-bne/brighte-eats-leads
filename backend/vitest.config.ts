@@ -6,5 +6,6 @@ const { parsed: testEnv } = configDotenv({ path: ".env.test" });
 export default defineConfig({
   test: {
     env: testEnv ?? {},
+    fileParallelism: false,
   },
 });

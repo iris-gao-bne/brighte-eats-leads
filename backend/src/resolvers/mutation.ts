@@ -9,7 +9,10 @@ export const mutationResolvers = {
     const parsedInput = RegisterInputSchema.safeParse(args);
     if (!parsedInput.success) {
       throw new GraphQLError(parsedInput.error.issues[0].message, {
-        extensions: { code: ErrorCode.BAD_USER_INPUT, issues: parsedInput.error.issues },
+        extensions: {
+          code: ErrorCode.BAD_USER_INPUT,
+          issues: parsedInput.error.issues,
+        },
       });
     }
 
@@ -25,14 +28,16 @@ export const mutationResolvers = {
     if (existing.length !== uniqueSlugs.length) {
       const found = new Set(existing.map((s) => s.slug));
       const unknownServices = uniqueSlugs.filter((s) => !found.has(s));
-      throw new GraphQLError(`Unknown service type(s): ${unknownServices.join(", ")}`, {
-        extensions: { code: ErrorCode.BAD_USER_INPUT },
-        
-      });
+      throw new GraphQLError(
+        `Unknown service type(s): ${unknownServices.join(", ")}`,
+        {
+          extensions: { code: ErrorCode.BAD_USER_INPUT },
+        },
+      );
     }
 
     try {
-      const lead = await prisma.lead.create({
+      return await prisma.lead.create({
         data: {
           name,
           email,
@@ -42,14 +47,7 @@ export const mutationResolvers = {
             create: uniqueSlugs.map((slug) => ({ serviceSlug: slug })),
           },
         },
-        include: { services: true },
       });
-
-      return {
-        ...lead,
-        services: lead.services.map((ls) => ls.serviceSlug),
-        createdAt: lead.createdAt.toISOString(),
-      };
     } catch (err) {
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&

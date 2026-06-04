@@ -1,20 +1,18 @@
-import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
+import { describe, it, expect, beforeEach, afterAll } from "vitest";
 import { mutationResolvers } from "../resolvers/mutation.js";
+import { leadFieldResolvers } from "../resolvers/lead.js";
+import { createContext } from "../context.js";
 import { prisma } from "../prisma.js";
 
-beforeAll(async () => {
-  await prisma.service.upsert({ where: { slug: "delivery" }, update: {}, create: { slug: "delivery", label: "Delivery" } });
-  await prisma.service.upsert({ where: { slug: "pick-up" }, update: {}, create: { slug: "pick-up", label: "Pick-up" } });
-  await prisma.service.upsert({ where: { slug: "payment" }, update: {}, create: { slug: "payment", label: "Payment" } });
-});
-
-afterEach(async () => {
+beforeEach(async () => {
   await prisma.leadService.deleteMany();
   await prisma.lead.deleteMany();
-  // Remove any services added by individual tests
   await prisma.service.deleteMany({
     where: { slug: { notIn: ["delivery", "pick-up", "payment"] } },
   });
+  await prisma.service.upsert({ where: { slug: "delivery" }, update: {}, create: { slug: "delivery", label: "Delivery" } });
+  await prisma.service.upsert({ where: { slug: "pick-up" }, update: {}, create: { slug: "pick-up", label: "Pick-up" } });
+  await prisma.service.upsert({ where: { slug: "payment" }, update: {}, create: { slug: "payment", label: "Payment" } });
 });
 
 afterAll(async () => {
@@ -39,8 +37,11 @@ describe("register mutation", () => {
     expect(lead.email).toBe(validArgs.email);
     expect(lead.mobile).toBe(validArgs.mobile);
     expect(lead.postcode).toBe(validArgs.postcode);
-    expect(lead.services).toEqual(["delivery"]);
-    expect(lead.createdAt).toBeDefined();
+
+    const context = createContext();
+    const services = await leadFieldResolvers.services(lead, null, context);
+    expect(services).toEqual(["delivery"]);
+    expect(leadFieldResolvers.createdAt(lead)).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 
   it("returns BAD_USER_INPUT on duplicate email", async () => {
@@ -62,7 +63,9 @@ describe("register mutation", () => {
       services: ["catering"],
     });
 
-    expect(lead.services).toContain("catering");
+    const context = createContext();
+    const services = await leadFieldResolvers.services(lead, null, context);
+    expect(services).toContain("catering");
   });
 
   it("rejects an unknown service slug with BAD_USER_INPUT", async () => {
@@ -79,6 +82,8 @@ describe("register mutation", () => {
       services: ["delivery", "delivery", "delivery"],
     });
 
-    expect(lead.services).toEqual(["delivery"]);
+    const context = createContext();
+    const services = await leadFieldResolvers.services(lead, null, context);
+    expect(services).toEqual(["delivery"]);
   });
 });
