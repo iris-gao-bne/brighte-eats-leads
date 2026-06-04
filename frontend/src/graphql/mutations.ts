@@ -1,29 +1,6 @@
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import type { Lead } from "./queries";
-
-export const REGISTER_MUTATION = gql`
-  mutation Register(
-    $name: String!
-    $email: String!
-    $mobile: String!
-    $postcode: String!
-    $services: [String!]!
-  ) {
-    register(
-      name: $name
-      email: $email
-      mobile: $mobile
-      postcode: $postcode
-      services: $services
-    ) {
-      id
-      name
-      email
-      services
-      createdAt
-    }
-  }
-`;
 
 export interface RegisterVars {
   name: string;
@@ -36,3 +13,28 @@ export interface RegisterVars {
 export interface RegisterData {
   register: Lead;
 }
+
+export const REGISTER_MUTATION: TypedDocumentNode<RegisterData, RegisterVars> =
+  gql`
+    mutation Register(
+      $name: String!
+      $email: String!
+      $mobile: String!
+      $postcode: String!
+      $services: [String!]!
+    ) {
+      register(
+        name: $name
+        email: $email
+        mobile: $mobile
+        postcode: $postcode
+        services: $services
+      ) {
+        id
+        name
+        email
+        services
+        createdAt
+      }
+    }
+  `;

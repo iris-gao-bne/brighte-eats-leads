@@ -1,7 +1,14 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import RegistrationForm from "./components/RegistrationForm";
+
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <h1 className="text-2xl font-semibold text-gray-800">Brighte Eats</h1>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
+        <Routes>
+          <Route path="/" element={<RegistrationForm />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }

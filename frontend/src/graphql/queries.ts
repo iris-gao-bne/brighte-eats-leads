@@ -1,46 +1,5 @@
 import { gql } from "@apollo/client";
-
-export const SERVICES_QUERY = gql`
-  query GetServices {
-    services {
-      slug
-      label
-    }
-  }
-`;
-
-export const LEADS_QUERY = gql`
-  query GetLeads($limit: Int, $offset: Int, $services: [String!]) {
-    leads(limit: $limit, offset: $offset, services: $services) {
-      total
-      items {
-        id
-        name
-        email
-        mobile
-        postcode
-        services
-        createdAt
-      }
-    }
-  }
-`;
-
-export const LEAD_QUERY = gql`
-  query GetLead($id: Int!) {
-    lead(id: $id) {
-      id
-      name
-      email
-      mobile
-      postcode
-      services
-      createdAt
-    }
-  }
-`;
-
-// TypeScript types matching the GraphQL schema
+import type { TypedDocumentNode } from "@apollo/client";
 
 export interface Service {
   slug: string;
@@ -62,10 +21,7 @@ export interface GetServicesData {
 }
 
 export interface GetLeadsData {
-  leads: {
-    total: number;
-    items: Lead[];
-  };
+  leads: { total: number; items: Lead[] };
 }
 
 export interface GetLeadsVars {
@@ -81,3 +37,46 @@ export interface GetLeadData {
 export interface GetLeadVars {
   id: number;
 }
+
+export const SERVICES_QUERY: TypedDocumentNode<
+  GetServicesData,
+  Record<string, never>
+> = gql`
+  query GetServices {
+    services {
+      slug
+      label
+    }
+  }
+`;
+
+export const LEADS_QUERY: TypedDocumentNode<GetLeadsData, GetLeadsVars> = gql`
+  query GetLeads($limit: Int, $offset: Int, $services: [String!]) {
+    leads(limit: $limit, offset: $offset, services: $services) {
+      total
+      items {
+        id
+        name
+        email
+        mobile
+        postcode
+        services
+        createdAt
+      }
+    }
+  }
+`;
+
+export const LEAD_QUERY: TypedDocumentNode<GetLeadData, GetLeadVars> = gql`
+  query GetLead($id: Int!) {
+    lead(id: $id) {
+      id
+      name
+      email
+      mobile
+      postcode
+      services
+      createdAt
+    }
+  }
+`;
