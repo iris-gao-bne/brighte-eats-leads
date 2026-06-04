@@ -1,0 +1,24 @@
+{
+  "name": "brighte-eats-leads",
+  "version": "1.0.0",
+  "description": "Expression of interest collector and dashboard for Brighte Eats.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently --names \"BE,FE\" --prefix-colors \"blue,green\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iris-gao-bne/brighte-eats-leads.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/iris-gao-bne/brighte-eats-leads/issues"
+  },
+  "homepage": "https://github.com/iris-gao-bne/brighte-eats-leads#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
