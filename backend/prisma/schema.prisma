@@ -32,7 +32,7 @@ model LeadService {
   service     Service @relation(fields: [serviceSlug], references: [slug])
 
   @@id([leadId, serviceSlug])
-  @@index([serviceSlug])
+  @@index([serviceSlug, leadId])
 }
 
 model User {
