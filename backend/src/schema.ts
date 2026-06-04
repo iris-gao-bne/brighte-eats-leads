@@ -14,9 +14,15 @@ export const typeDefs = `#graphql
     total: Int!
   }
 
+  type Service {
+    slug: String!
+    label: String!
+  }
+
   type Query {
     leads(limit: Int, offset: Int, services: [String!]): LeadsPage!
     lead(id: Int!): Lead
+    services: [Service!]!
   }
 
   type Mutation {

@@ -35,4 +35,8 @@ export const queryResolvers = {
   lead: async (_: unknown, args: { id: number }) => {
     return prisma.lead.findUnique({ where: { id: args.id } });
   },
+
+  services: async () => {
+    return prisma.service.findMany({ orderBy: { slug: "asc" } });
+  },
 };
