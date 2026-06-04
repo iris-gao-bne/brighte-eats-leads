@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { REGISTER_MUTATION } from "../graphql/mutations";
@@ -39,7 +40,8 @@ function getApiError(error: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-export default function RegistrationForm() {
+export default function RegisterPage() {
+  const navigate = useNavigate();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [success, setSuccess] = useState(false);
@@ -81,9 +83,17 @@ export default function RegistrationForm() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
-        Express Interest
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Express Interest
+        </h2>
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
 
       {success && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
