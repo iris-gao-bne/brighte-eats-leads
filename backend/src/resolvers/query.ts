@@ -31,4 +31,8 @@ export const queryResolvers = {
 
     return { items, total };
   },
+
+  lead: async (_: unknown, args: { id: number }) => {
+    return prisma.lead.findUnique({ where: { id: args.id } });
+  },
 };
